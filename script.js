@@ -3,6 +3,7 @@ const puppeteer = require("puppeteer");
 
 const url =
     "https://www.facebook.com/marketplace/103432163030646/search/?query=motorcycle&exact=false";
+const LIMIT = 10;
 
 // entry function
 async function init() {
@@ -26,7 +27,7 @@ async function init() {
     // call autoScroll
     await autoScroll(page);
 
-    const finalOutput = await page.$$eval(
+    let finalOutput = await page.$$eval(
         "div > div > div > div.rq0escxv.l9j0dhe7.du4w35lb > div > div > div.j83agx80.cbu4d94t.d6urw2fd.dp1hu0rb.l9j0dhe7.du4w35lb > div.rq0escxv.pfnyh3mw.jifvfom9.gs1a9yip.owycx6da.btwxx1t3.j83agx80.buofh1pr.dp1hu0rb.l9j0dhe7.du4w35lb > div.rq0escxv.l9j0dhe7.du4w35lb.cbu4d94t.d2edcug0.hpfvmrgz.rj1gh0hx.buofh1pr.g5gj957u.j83agx80.dp1hu0rb > div > div > div.fome6x0j.tkqzz1yd.aodizinl.fjf4s8hc.f7vcsfb0 > div > div.bq4bzpyk.j83agx80.btwxx1t3.lhclo0ds.jifvfom9.muag1w35.dlv3wnog.enqfppq2.rl04r1d5 > div",
         (anchors) => {
             let scrappedData = anchors
@@ -86,19 +87,11 @@ async function init() {
         }
     );
 
-    // stringify
-    const jsonContent = JSON.stringify(finalOutput);
-
-    // save to file
-    fs.writeFile("data.json", jsonContent, "utf-8", (err) => {
-        if (err) {
-            console.log(err);
-        }
-        console.log("File saved!");
-    });
     console.log("Complete scraping!");
 
     await browser.close();
+
+    return finalOutput;
 }
 
 // auto scroll
@@ -121,4 +114,5 @@ async function autoScroll(page) {
     });
 }
 
-init();
+// run init().then((res) => console.log(res.splice(0, LIMIT))); to debug
+init().then((res) => res.splice(0, LIMIT));
